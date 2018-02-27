@@ -8,26 +8,34 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.Serializable;
 
 /**
- * Created by Patrick on 2/8/2018.
+ * A class that creates a Vehicle object and all its important attributes.
+ * Implements Parcelable and Serializable in order to pass data structs of
+ * Vehicle objects between fragments or to write data structs of Vehicle
+ * objects to internal device memory.
+ *
+ * @author  Patrick Fitzgerald
+ * @version 1.0
+ * @since   2018-02-14
  */
-
 public class Vehicle implements Parcelable, Serializable {
 
-    private String mStockNumber;
-    private String mMake, mModel, mTrim, mColor, mBody;
+    private String mStockNumber; // This is the vehicles inventory number.
+    private String mMake, mModel, mTrim, mColor, mBody; // All the important details for describing a vehicle.
     private int mYear, mRunPosition;
-    private double mLat, mLong;
-    private LatLng mVehicleLocation;
-    private boolean mFavorite;
-    transient private Thread myThread;
+    private double mLat, mLong; // Set using the device's current GPS coordinates.
+    private boolean mFavorite; // Used to keep track of favorite Vehicles.
 
+    /**
+     * The vehicle constructor.
+     */
     public Vehicle() {
         mFavorite = false;
-        this.myThread = new Thread();
     }
 
 
-    // Creator
+    /**
+     * Creator method for implementing Parcelable interface.
+     */
     public static final Creator CREATOR
             = new Creator() {
         public Vehicle createFromParcel(Parcel in) {
@@ -44,6 +52,11 @@ public class Vehicle implements Parcelable, Serializable {
         return 0;
     }
 
+    /**
+     * Create a Parcelable string from object attributes. 
+     * @param dest
+     * @param flags
+     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mStockNumber);
@@ -55,7 +68,10 @@ public class Vehicle implements Parcelable, Serializable {
         dest.writeInt(mYear);
     }
 
-    // "De-parcel object
+    /**
+     * Retrieve Parcelable Vehicle object.
+     * @param in
+     */
     public Vehicle(Parcel in) {
         mStockNumber = in.readString();
         mMake = in.readString();
@@ -66,6 +82,7 @@ public class Vehicle implements Parcelable, Serializable {
         mYear = in.readInt();
     }
 
+    // The getters and the setter. Pretty self-explanatory.
 
     public String getStockNumber() {
         return mStockNumber;
@@ -147,14 +164,6 @@ public class Vehicle implements Parcelable, Serializable {
         this.mLong = Long;
     }
 
-    public LatLng getVehicleLocation() {
-        return mVehicleLocation;
-    }
-
-    public void setVehicleLocation(LatLng mVehicleLocation) {
-        this.mVehicleLocation = mVehicleLocation;
-    }
-
     public boolean isFavorite() {
         return mFavorite;
     }
@@ -162,4 +171,5 @@ public class Vehicle implements Parcelable, Serializable {
     public void setFavorite(boolean mFavorite) {
         this.mFavorite = mFavorite;
     }
+
 }
