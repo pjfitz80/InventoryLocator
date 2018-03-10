@@ -151,8 +151,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(checkPermissions()) {
             mMap.setMyLocationEnabled(true);
         }
-        // Add a marker @ carmax and move the camera
-        LatLng startLocation = new LatLng(47.20629614, -122.296838);
+        
+        LatLng startLocation = new LatLng(mDeviceCurrentLat, mDeviceCurrentLong);
         // For zooming automatically to the location of the marker
         CameraPosition cameraPosition = new CameraPosition.Builder().target(startLocation).zoom(18).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
