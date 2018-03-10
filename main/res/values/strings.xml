@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">MyInventoryLocator</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="incomplete_scan_dialog_title">Incomplete Stock Number</string>
+    <string name="incomplete_scan_dialog_message">You have captured an incomplete stock number!</string>
+    <string name="incomplete_scan_dialog_positive">Try Again</string>
+    <string name="incomplete_scan_dialog_negative">Quit</string>
+
+    <string name="stock_number_not_found_dialog_title">Stock Number Not Found!</string>
+    <string name="stock_number_not_found_dialog_message">You can add this vehicle to the inventory by scanning it\'s location.</string>
+    <string name="stock_number_not_found_dialog_positive">OK</string>
+
+    <string name="vehicle_location_scan_dialog_title">Vehicle Location Scan</string>
+    <string name="vehicle_location_scan_dialog_message"> scanned and added to the inventory.</string>
+    <string name="vehicle_location_scan_dialog_positive">Keep Scanning</string>
+    <string name="vehicle_location_scan_dialog_negative">Quit Scanning</string>
+
+
+</resources>

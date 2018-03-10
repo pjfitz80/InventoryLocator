@@ -1,0 +1,43 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".activity.MapsActivity">
+
+    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/map"
+        class ="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:scrollbars="vertical"
+        tools:context="com.example.patrick.myinventorylocator.activity.MapsActivity" />
+
+    <EditText
+        android:id="@+id/search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="10dp"
+        android:paddingRight="40dp"
+        android:paddingLeft="40dp"
+        android:inputType="numberPassword"
+        android:imeOptions="actionSearch"
+        android:hint="Enter A Stock # Here"
+        android:background="@drawable/custom_border"
+        android:gravity="center_horizontal"/>
+
+    <com.robertlevonyan.views.customfloatingactionbutton.FloatingActionButton
+        android:id="@+id/custom_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="30dp"
+        app:fabIcon="@drawable/ic_dots_vert"
+        app:fabColor="@color/myBlue"
+        app:fabIconColor="@color/myWhite"
+        app:fabElevation="50dp" />
+
+</FrameLayout>
