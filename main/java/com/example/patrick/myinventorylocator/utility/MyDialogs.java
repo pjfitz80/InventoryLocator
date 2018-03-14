@@ -49,6 +49,7 @@ public class MyDialogs {
                         returnToMapActivity();
                     }
                 });
+        dialogSound();
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
@@ -62,11 +63,11 @@ public class MyDialogs {
                 .setCancelable(false)
                 .setPositiveButton(R.string.stock_number_not_found_dialog_positive,new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
+                        mp.release();
                         dialog.cancel();
                     }
                 });
-        mp = MediaPlayer.create(mContext, R.raw.mario_negative);
-        mp.start();
+        dialogSound();
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
@@ -95,8 +96,16 @@ public class MyDialogs {
     /** A dialog for editing a Vehicles attributes. WIll make use of
      * the Vehicle object's getters/setters to fill in previously null fields.
      */
-    public void vehiclaEditorDialog() {
+    public void vehicleEditorDialog() {
 
+    }
+
+    /**
+     * This method plays a sound effect when a dialog is created and shown.
+     */
+    private void dialogSound() {
+        mp = MediaPlayer.create(mContext, R.raw.mario_negative);
+        mp.start();
     }
 
     /**
