@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
@@ -17,7 +18,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.example.patrick.myinventorylocator.R;
 import com.example.patrick.myinventorylocator.activity.MapsActivity;
@@ -84,25 +84,14 @@ public class BarcodeScanFragment extends Fragment {
 
         cameraSource = new CameraSource.Builder(getContext(), barcodeDetector)
                 .setRequestedPreviewSize(1600, 1024)
+                .setRequestedFps(15.0f)
                 .setAutoFocusEnabled(true)
                 .build();
 
         cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                try {
-                    // Request camera permissions if not already granted.
-                    if (ActivityCompat.checkSelfPermission(getContext(),
-                            android.Manifest.permission.CAMERA)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(getActivity(),
-                                new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CAMERA);
-                        return;
-                    }
-                    cameraSource.start(cameraView.getHolder()); // Start the camera using the Surfaceview as a preview.
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                startCamera();
             }
 
             @Override
@@ -122,34 +111,17 @@ public class BarcodeScanFragment extends Fragment {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
+                Log.d("Barcode Detected!!!", "Barcode Detected!!!");
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if (barcodes.size() != 0) {
+                    Log.d("Barcode != 0 detected: ", "Barcode != 0 detected: ");
 
                     barcodeValue.post(new Runnable() {
                         @Override
                         public void run() {
                             cameraSource.stop();
+                            Log.d("CameraSource Stopped", "CameraSource Stopped");
                             validateBarcode(barcodes);
-
-                            /*
-                            try {
-                                myDialogs.scanVehicleLocationDialog();
-                                validateBarcode(barcodes);
-                                cameraSource.wait(4000);
-                                cameraSource.start(cameraView.getHolder());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            */
-
-                            /*
-                            myDialogs.scanVehicleLocationDialog();
-                            try {
-                                cameraSource.start(cameraView.getHolder());
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                            */
                         }
                     });
                 }
@@ -159,21 +131,42 @@ public class BarcodeScanFragment extends Fragment {
     }
 
     /**
+     * This method starts the camera source after first checking that permissions have been granted.
+     */
+    private void startCamera() {
+        try {
+            // Request camera permissions if not already granted.
+            if (ActivityCompat.checkSelfPermission(getContext(),
+                    android.Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CAMERA);
+                return;
+            }
+            cameraSource.start(cameraView.getHolder()); // Start the camera using the Surfaceview as a preview.
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
      * This method makes sure the barcode scanned is of the proper length and format for use throughout the app.
      * @param theSparseArray The array that holds barcodes successfully scanned using the camera resource.
      */
     private void validateBarcode(SparseArray<Barcode> theSparseArray) {
+        Log.d("validate() start", "validate() start");
 
         // Create barcode as int from scanned String barcode.
         int barcodeAsInt = Integer.parseInt(theSparseArray.valueAt(0).displayValue);
-
+        Log.d("Detected length= ", String.valueOf(String.valueOf(barcodeAsInt).length()));
         String barcodeAsString = String.valueOf(barcodeAsInt);
 
         // Ensure the full barcode was properly scanned producing a String of length 9.
         if(barcodeAsString.length() == 9) {
+            Log.d("Barcode length = 9 ","Barcode length = 9 ");
+
             mp = MediaPlayer.create(getContext(), R.raw.mario_coin);
             mp.start();
-            mp.release();
 
             /* The scanned barcode is 9 digits, but we do not need the last digit for our purposes.
                This easily and effectively removes the last digit. */
@@ -182,13 +175,15 @@ public class BarcodeScanFragment extends Fragment {
             barcodeAsString = String.valueOf(barcodeAsInt);
             mListener.onFragmentInteraction(barcodeAsString); // Send our valid String back to the Map Activity.
             barcodeValue.setText(barcodeAsString);
+
+            startCamera();
         }
         else {
-            //mp = MediaPlayer.create(getContext(), R.raw.mario_negative);
-            //mp.start();
-            for(int i=0;i<2;i++){ myVib.vibrate(20);};
+            Log.d("Barcode length != 9", "Barcode length != 9");
+            for(int i = 0; i < 2; i++){ myVib.vibrate(20);};
 
             myDialogs.incompleteStockNumberDialog(); // Handle user decision upon improperly scanned barcode.
+            startCamera();
         }
     }
 
@@ -212,19 +207,11 @@ public class BarcodeScanFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mp.release();
         cameraSource.release();
         barcodeDetector.release();
     }
-
-    /**
-     * Refresh the scanner fragment and restart the camera resource.
-     */
-    public void refreshFragment() {
-        BarcodeScanFragment temp = new BarcodeScanFragment();
-        getFragmentManager().findFragmentById(R.id.map);
-        getFragmentManager().beginTransaction().detach(temp).attach(temp).commit();
-    }
-
+    
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
