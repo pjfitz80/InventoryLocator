@@ -14,13 +14,14 @@
         android:layout_height="match_parent"
         android:layout_gravity="top|center">
 
-        <Button
+        <TextView
             android:id="@+id/barcode_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Scanner Result"
-            android:background="@drawable/custom_border"
-            android:layout_gravity="bottom|center"
+            android:textColor="@color/myWhite"
+            android:textSize="30sp"
+            android:layout_gravity="top|center"
             android:gravity="center_horizontal"/>
 
     </FrameLayout>
