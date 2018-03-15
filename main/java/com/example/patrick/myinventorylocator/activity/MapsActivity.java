@@ -87,7 +87,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mEditText = (EditText) findViewById(R.id.search);
         mEditText.setTransformationMethod(null);
-
         mEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -112,20 +111,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        /*
-        if(mapReady) {
-            updateMyCurrentLocation();
-        }
-        */
-
         updateMyCurrentLocation();
 
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        mEditText.setVisibility(View.VISIBLE);
+    public void onBackPressed() {
+        android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            mEditText.setVisibility(View.VISIBLE);
+        }
+        super.onBackPressed();
     }
 
     @Override
@@ -151,8 +147,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(checkPermissions()) {
             mMap.setMyLocationEnabled(true);
         }
-        
-        LatLng startLocation = new LatLng(mDeviceCurrentLat, mDeviceCurrentLong);
+
+        LatLng startLocation = new LatLng(47.20629614, -122.296838);
         // For zooming automatically to the location of the marker
         CameraPosition cameraPosition = new CameraPosition.Builder().target(startLocation).zoom(18).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
