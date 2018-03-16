@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -66,6 +67,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MyFileReadWrite myFileRW;
     private String subFolder = "/userdata";
     private String file = "test.ser";
+    private MediaPlayer mp;
     private boolean mapReady = false;
 
     @Override
@@ -83,6 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myFileRW = new MyFileReadWrite(getApplication());
         mInventoryHashMap = new HashMap<>();
         mInventoryHashMap = myFileRW.readFile(subFolder, file);
+        mp = MediaPlayer.create(this, R.raw.mario_pipe_2);
 
         mEditText = (EditText) findViewById(R.id.search);
         mEditText.setTransformationMethod(null);
@@ -111,22 +114,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         updateMyCurrentLocation();
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            mEditText.setVisibility(View.VISIBLE);
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();  // Always call the superclass method first
-        myFileRW.writeFile(mInventoryHashMap, subFolder, file); // Save the current Inventory hashmap to internal storage before app closes.
     }
 
     /**
@@ -141,7 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         if(checkPermissions()) {
             mMap.setMyLocationEnabled(true);
         }
@@ -150,6 +137,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // For zooming automatically to the location of the marker
         CameraPosition cameraPosition = new CameraPosition.Builder().target(startLocation).zoom(18).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        mp.start();
 
         //mapReady = true;
     }
@@ -240,7 +229,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     private void openBarcodeScanner() {
         BarcodeScanFragment tempFrag = new BarcodeScanFragment();
-        //BarcodeScannerFragment tempFrag =  new BarcodeScannerFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.map, tempFrag, "")
                 .addToBackStack(null).commit();
     }
@@ -250,7 +238,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * @param theString
      */
     private void addMarker(String theString) {
-        // If the Vehicle stock number requested exists in the inventory hashmap.
         if(mInventoryHashMap.containsKey(theString)) {
             double tempLat = mInventoryHashMap.get(theString).getLat();
             double tempLong = mInventoryHashMap.get(theString).getLong();
@@ -277,7 +264,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * Callback method that receives barcode scan result as a String. 
+     * Callback method that receives barcode scan result as a String.
      * @param theStockNumber
      */
     @Override
@@ -285,4 +272,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setCurrentLocation(theStockNumber);
     }
 
+    @Override
+    public void onBackPressed() {
+        android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            mEditText.setVisibility(View.VISIBLE);
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();  // Always call the superclass method first
+        myFileRW.writeFile(mInventoryHashMap, subFolder, file); // Save the current Inventory hashmap to internal storage before app closes.
+    }
 }
