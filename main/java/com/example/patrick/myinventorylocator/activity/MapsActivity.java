@@ -80,10 +80,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //createInventoryHashMapFromFile(THE_XML_FILE_NAME);
 
         myDialogs = new MyDialogs(this);
-        myFileRW = new MyFileReadWrite();
+        myFileRW = new MyFileReadWrite(getApplication());
         mInventoryHashMap = new HashMap<>();
-        readFromFile();
-        //mInventoryHashMap = myFileRW.readFile();
+        mInventoryHashMap = myFileRW.readFile(subFolder, file);
 
         mEditText = (EditText) findViewById(R.id.search);
         mEditText.setTransformationMethod(null);
@@ -127,8 +126,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStop() {
         super.onStop();  // Always call the superclass method first
-        writeToFile(); // Save the current Inventory hashmap to internal storage before app closes.
-        //myFileRW.writeFile(mInventoryHashMap);
+        myFileRW.writeFile(mInventoryHashMap, subFolder, file); // Save the current Inventory hashmap to internal storage before app closes.
     }
 
     /**
@@ -283,102 +281,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setCurrentLocation(theStockNumber);
     }
 
-    /**
-     * This method stores the current Inventory hashmap in the devices internal storage.
-     */
-    public void writeToFile() {
-        File cacheDir = null;
-        File appDirectory = null;
-
-        if (android.os.Environment.getExternalStorageState().
-                equals(android.os.Environment.MEDIA_MOUNTED)) {
-            cacheDir = getApplicationContext().getExternalCacheDir();
-            appDirectory = new File(cacheDir + subFolder);
-
-        } else {
-            cacheDir = getApplicationContext().getCacheDir();
-            String BaseFolder = cacheDir.getAbsolutePath();
-            appDirectory = new File(BaseFolder + subFolder);
-
-        }
-
-        if (appDirectory != null && !appDirectory.exists()) {
-            appDirectory.mkdirs();
-        }
-
-        File fileName = new File(appDirectory, file);
-        FileOutputStream fos = null;
-        ObjectOutputStream out = null;
-        try {
-            fos = new FileOutputStream(fileName);
-            out = new ObjectOutputStream(fos);
-            out.writeObject(mInventoryHashMap);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }  catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fos != null)
-                    fos.flush();
-                fos.close();
-                if (out != null)
-                    out.flush();
-                out.close();
-            } catch (Exception e) {
-
-            }
-        }
-    }
-
-    /**
-     * This method retrieves the Inventory hashmap from the devices internal storage.
-     */
-    public void readFromFile() {
-        File cacheDir = null;
-        File appDirectory = null;
-        if (android.os.Environment.getExternalStorageState().
-                equals(android.os.Environment.MEDIA_MOUNTED)) {
-            cacheDir = getApplicationContext().getExternalCacheDir();
-            appDirectory = new File(cacheDir + subFolder);
-        } else {
-            cacheDir = getApplicationContext().getCacheDir();
-            String BaseFolder = cacheDir.getAbsolutePath();
-            appDirectory = new File(BaseFolder + subFolder);
-        }
-
-        if (appDirectory != null && !appDirectory.exists()) return; // File does not exist
-
-        File fileName = new File(appDirectory, file);
-        FileInputStream fis = null;
-        ObjectInputStream in = null;
-        try {
-            fis = new FileInputStream(fileName);
-            in = new ObjectInputStream(fis);
-            HashMap<String, Vehicle> myHashMap = (HashMap<String, Vehicle> ) in.readObject();
-            mInventoryHashMap = myHashMap;
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            try {
-                if(fis != null) {
-                    fis.close();
-                }
-                if(in != null) {
-                    in.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }
