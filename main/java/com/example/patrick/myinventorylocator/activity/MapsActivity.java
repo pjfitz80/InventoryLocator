@@ -276,6 +276,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mInventoryHashMap.get(theString).setLong(mDeviceCurrentLong);
     }
 
+    /**
+     * Callback method that receives barcode scan result as a String. 
+     * @param theStockNumber
+     */
     @Override
     public void onFragmentInteraction(String theStockNumber) {
         setCurrentLocation(theStockNumber);
