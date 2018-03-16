@@ -21,26 +21,27 @@ import java.util.HashMap;
 public class MyFileReadWrite {
 
     private Context mContext;
-    private String subFolder = "/userdata";
-    private String file = "test.ser";
 
-    public MyFileReadWrite() {
-
+    public MyFileReadWrite(Context theContext) {
+        mContext = theContext;
     }
 
-    public void writeFile(HashMap<String, Vehicle> theHashMap) {
+    /**
+     * This method stores the current Inventory hashmap in the devices internal storage.
+     */
+    public void writeFile(HashMap<String, Vehicle> theHashMap, String theSubFolder, String theFileName) {
         File cacheDir = null;
         File appDirectory = null;
 
         if (android.os.Environment.getExternalStorageState().
                 equals(android.os.Environment.MEDIA_MOUNTED)) {
             cacheDir = mContext.getExternalCacheDir();
-            appDirectory = new File(cacheDir + subFolder);
+            appDirectory = new File(cacheDir + theSubFolder);
 
         } else {
             cacheDir = mContext.getCacheDir();
             String BaseFolder = cacheDir.getAbsolutePath();
-            appDirectory = new File(BaseFolder + subFolder);
+            appDirectory = new File(BaseFolder + theSubFolder);
 
         }
 
@@ -48,7 +49,7 @@ public class MyFileReadWrite {
             appDirectory.mkdirs();
         }
 
-        File fileName = new File(appDirectory, file);
+        File fileName = new File(appDirectory, theFileName);
 
         FileOutputStream fos = null;
         ObjectOutputStream out = null;
@@ -74,24 +75,27 @@ public class MyFileReadWrite {
         }
     }
 
-    public HashMap<String, Vehicle> readFile() {
+    /**
+     * This method retrieves the Inventory hashmap from the devices internal storage.
+     */
+    public HashMap<String, Vehicle> readFile(String theSubFolder, String theFileName) {
         File cacheDir = null;
         File appDirectory = null;
         if (android.os.Environment.getExternalStorageState().
                 equals(android.os.Environment.MEDIA_MOUNTED)) {
             cacheDir = mContext.getExternalCacheDir();
-            appDirectory = new File(cacheDir + subFolder);
+            appDirectory = new File(cacheDir + theSubFolder);
         } else {
             cacheDir = mContext.getCacheDir();
             String BaseFolder = cacheDir.getAbsolutePath();
-            appDirectory = new File(BaseFolder + subFolder);
+            appDirectory = new File(BaseFolder + theSubFolder);
         }
 
         if (appDirectory != null && !appDirectory.exists()) {
 
         }
 
-        File fileName = new File(appDirectory, file);
+        File fileName = new File(appDirectory, theFileName);
 
         FileInputStream fis = null;
         ObjectInputStream in = null;
