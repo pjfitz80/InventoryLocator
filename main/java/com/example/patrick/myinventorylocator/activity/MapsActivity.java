@@ -63,12 +63,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double mDeviceCurrentLat; // The current latitude of the device.
     private double mDeviceCurrentLong; // The current longitude of the device.
     private EditText mEditText;
+    private FloatingActionButton fab;
     private MyDialogs myDialogs;
     private MyFileReadWrite myFileRW;
     private String subFolder = "/userdata";
     private String file = "test.ser";
     private MediaPlayer mp;
-    private boolean mapReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +83,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         myDialogs = new MyDialogs(this);
         myFileRW = new MyFileReadWrite(getApplication());
-        mInventoryHashMap = new HashMap<>();
         mInventoryHashMap = myFileRW.readFile(subFolder, file);
         mp = MediaPlayer.create(this, R.raw.mario_pipe_2);
 
@@ -104,12 +103,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.custom_fab);
+        fab = (FloatingActionButton) findViewById(R.id.custom_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openBarcodeScanner();
                 mEditText.setVisibility(View.INVISIBLE);
+                fab.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -139,8 +139,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         mp.start();
-
-        //mapReady = true;
     }
 
     /**
@@ -234,6 +232,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
+     * This method build and returns a string based on values stored in the Vehicle object
+     * for display as the map marker snippet.
+     * @param theStockNumber String stock number of the vehicle who's info you want.
+     * @return theResult A single String built from Vehicle object fields.
+     */
+    private String getVehicleInfo(String theStockNumber) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(mInventoryHashMap.get(theStockNumber).getYear());
+        builder.append(" ");
+        builder.append(mInventoryHashMap.get(theStockNumber).getMake());
+        builder.append(" ");
+        builder.append(mInventoryHashMap.get(theStockNumber).getModel());
+        builder.append(" ");
+        builder.append(mInventoryHashMap.get(theStockNumber).getTrim());
+        String theResult = builder.toString();
+
+        return theResult;
+    }
+
+    /**
      * This method adds a marker to the map using the lat/long attached to the Vehicle object.
      * @param theString
      */
@@ -242,7 +260,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double tempLat = mInventoryHashMap.get(theString).getLat();
             double tempLong = mInventoryHashMap.get(theString).getLong();
             LatLng temp = new LatLng(tempLat, tempLong);
-            mMap.addMarker(new MarkerOptions().position(temp).title(theString)).showInfoWindow();
+            String tempSnippet = getVehicleInfo(theString);
+            mMap.addMarker(new MarkerOptions().position(temp).title(theString).snippet(tempSnippet)).showInfoWindow();
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(temp).zoom(18).build();
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
         else {
             myDialogs.stockNumberNotFoundDialog(); // Dialog handling input not found in Inventory hashmap.
@@ -277,6 +298,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
             mEditText.setVisibility(View.VISIBLE);
+            fab.setVisibility(View.VISIBLE);
         }
         super.onBackPressed();
     }
