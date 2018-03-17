@@ -31,28 +31,6 @@ public class MyDialogs {
         alertDialogBuilder = new AlertDialog.Builder(mContext);
     }
 
-    /**
-     * A dialog to handle the event of the barcode scanner
-     * not capturing a complete barcode.
-     */
-    public void incompleteStockNumberDialog() {
-        alertDialogBuilder.setTitle(R.string.incomplete_scan_dialog_title);
-        alertDialogBuilder.setMessage(R.string.incomplete_scan_dialog_message)
-                .setCancelable(false)
-                .setPositiveButton(R.string.incomplete_scan_dialog_positive,new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        dialog.cancel();
-                    }
-                })
-                .setNegativeButton(R.string.incomplete_scan_dialog_negative,new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        returnToMapActivity();
-                    }
-                });
-        dialogSound();
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
 
     /** A dialog to handle the event of the user entering a stock number
      * that is not yet part of the inventory.
