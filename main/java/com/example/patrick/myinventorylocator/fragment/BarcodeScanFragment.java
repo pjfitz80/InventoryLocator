@@ -12,12 +12,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.patrick.myinventorylocator.R;
 import com.example.patrick.myinventorylocator.activity.MapsActivity;
@@ -45,7 +47,8 @@ public class BarcodeScanFragment extends Fragment {
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
     private SurfaceView cameraView;
-    private Button barcodeValue;
+    private TextView barcodeValue;
+    private TextView mScannerClose;
     private Vibrator myVib;
     private OnFragmentInteractionListener mListener;
     private MyDialogs myDialogs;
@@ -66,13 +69,15 @@ public class BarcodeScanFragment extends Fragment {
 
         myVib = (Vibrator) getActivity().getSystemService(VIBRATOR_SERVICE);
 
-        barcodeValue = (Button) rootView.findViewById(R.id.barcode_value); // Displays the value of a successful barcode scan.
-        barcodeValue.setOnClickListener(new View.OnClickListener() {
+        mp = MediaPlayer.create(getContext(), R.raw.mario_coin);
+
+        barcodeValue = (TextView) rootView.findViewById(R.id.barcode_value); // Displays the value of a successful barcode scan.
+
+        mScannerClose = (TextView) rootView.findViewById(R.id.scanner_close);
+        mScannerClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mIntent = new Intent(getActivity() , MapsActivity.class);
-                mIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(mIntent);
+                getActivity().onBackPressed();
             }
         });
 
@@ -111,11 +116,8 @@ public class BarcodeScanFragment extends Fragment {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
-                Log.d("Barcode Detected!!!", "Barcode Detected!!!");
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if (barcodes.size() != 0) {
-                    Log.d("Barcode != 0 detected: ", "Barcode != 0 detected: ");
-
                     barcodeValue.post(new Runnable() {
                         @Override
                         public void run() {
@@ -164,8 +166,6 @@ public class BarcodeScanFragment extends Fragment {
         // Ensure the full barcode was properly scanned producing a String of length 9.
         if(barcodeAsString.length() == 9) {
             Log.d("Barcode length = 9 ","Barcode length = 9 ");
-
-            mp = MediaPlayer.create(getContext(), R.raw.mario_coin);
             mp.start();
 
             /* The scanned barcode is 9 digits, but we do not need the last digit for our purposes.
@@ -175,16 +175,8 @@ public class BarcodeScanFragment extends Fragment {
             barcodeAsString = String.valueOf(barcodeAsInt);
             mListener.onFragmentInteraction(barcodeAsString); // Send our valid String back to the Map Activity.
             barcodeValue.setText(barcodeAsString);
-
-            startCamera();
         }
-        else {
-            Log.d("Barcode length != 9", "Barcode length != 9");
-            for(int i = 0; i < 2; i++){ myVib.vibrate(20);};
-
-            myDialogs.incompleteStockNumberDialog(); // Handle user decision upon improperly scanned barcode.
-            startCamera();
-        }
+        startCamera();
     }
 
     @Override
@@ -211,7 +203,7 @@ public class BarcodeScanFragment extends Fragment {
         cameraSource.release();
         barcodeDetector.release();
     }
-    
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
