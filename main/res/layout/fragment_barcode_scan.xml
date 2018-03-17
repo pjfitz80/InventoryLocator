@@ -2,12 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.patrick.myinventorylocator.fragment.BarcodeScanFragment">
+    tools:context="com.example.patrick.myinventorylocator.fragment.BarcodeScanFragment"
+    android:layout_margin="15dp"
+    android:background="@color/myWhite">
 
     <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_margin="7dp"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -23,6 +26,18 @@
             android:textSize="30sp"
             android:layout_gravity="top|center"
             android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/scanner_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minEms="2"
+            android:layout_gravity="bottom|right"
+            android:gravity="center"
+            android:text="X"
+            android:textColor="@color/myRed"
+            android:textSize="30sp"
+            android:background="@color/myWhite"/>
 
     </FrameLayout>
 
